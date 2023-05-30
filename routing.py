@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from database import create_connection, create_table, insert_data
 def home():
     st.title("Aplikasi Saham")
@@ -59,9 +60,92 @@ def home():
 
 
 
-def tuning():
-    st.title("Tuning Model")
-    # Tambahkan kode untuk tampilan halaman prediksi
+def rnn_tuning():
+    st.title("Hyperparameter Tuning Models")
+    st.divider()
+    col1, col2 = st.columns(2)
+
+    with st.container():
+        with col1:
+            # Tambahkan kode untuk tampilan halaman prediksi
+            st.write("Hyperparameter RNN Model Tuning")
+        
+        with col2:
+            if st.button('Run RNN tuning'):
+                def run_RNN_tuning():
+                    import subprocess
+                    subprocess.run(['python', 'RNN_tuning.py'], check=True)
+                run_RNN_tuning()
+        try:
+            rnn_df = pd.read_csv('RNN_tuning_result.csv')
+            if rnn_df is not None:
+
+                # Dapatkan parameter terbaik berdasarkan indeks
+                best_row = rnn_df['rank_test_score'] == 1
+                best_params = rnn_df.loc[best_row, 'params'].values[0]
+                best_rmse = rnn_df.loc[best_row, 'RMSE'].values[0]
+                st.write("Kombinasi parameter terbaik: ", best_params)
+                st.write("Nilai RMSE: ", best_rmse)
+                st.dataframe(rnn_df)
+        except FileNotFoundError:
+            st.warning("Belum melakukan tuning model.")
+
+def gru_tuning():
+    col1, col2 = st.columns(2)
+
+    with st.container():
+        with col1:
+            # Tambahkan kode untuk tampilan halaman prediksi
+            st.write("Hyperparameter GRU Model Tuning")
+        
+        with col2:
+            if st.button('Run GRU tuning'):
+                def run_GRU_tuning():
+                    import subprocess
+                    subprocess.run(['python', 'GRU_tuning.py'], check=True)
+                run_GRU_tuning()
+        try:
+            gru_df = pd.read_csv('GRU_tuning_result.csv')
+            if gru_df is not None:
+
+                # Dapatkan parameter terbaik berdasarkan indeks
+                best_row = gru_df['rank_test_score'] == 1
+                best_params = gru_df.loc[best_row, 'params'].values[0]
+                best_rmse = np.sqrt(-gru_df.loc[best_row, 'mean_test_score'].values[0])
+                st.write("Kombinasi parameter terbaik: ",best_params)
+                st.dataframe(gru_df)
+
+        except FileNotFoundError:
+            st.warning("Belum melakukan tuning model.")
+
+def lstm_tuning():
+    col1, col2 = st.columns(2)
+
+    with st.container():
+        with col1:
+            # Tambahkan kode untuk tampilan halaman prediksi
+            st.write("Hyperparameter LSTM Model Tuning")
+        
+        with col2:
+            if st.button('Run LSTM tuning'):
+                def run_LSTM_tuning():
+                    import subprocess
+                    subprocess.run(['python', 'LSTM_tuning.py'], check=True)
+                run_LSTM_tuning()
+        try:
+            lstm_df = pd.read_csv('LSTM_tuning_result.csv')
+            if lstm_df is not None:
+
+                # Dapatkan parameter terbaik berdasarkan indeks
+                best_row = lstm_df['rank_test_score'] == 1
+                best_params = lstm_df.loc[best_row, 'params'].values[0]
+                best_rmse = np.sqrt(-lstm_df.loc[best_row, 'mean_test_score'].values[0])
+                st.write("Kombinasi parameter terbaik: ",best_params)
+                st.dataframe(lstm_df)
+
+        except FileNotFoundError:
+            st.warning("Belum melakukan tuning model.")
+          
 
 # Main function untuk mengatur routing berdasarkan URL
 def main():
@@ -71,7 +155,11 @@ def main():
     if menu == "Home":
         home()
     elif menu == "Tuning Model":
-        tuning()
+        rnn_tuning()
+        st.divider()
+        gru_tuning()
+        st.divider()
+        lstm_tuning()
 
 if __name__ == "__main__":
     main()

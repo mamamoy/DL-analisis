@@ -7,6 +7,7 @@ from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, SimpleRNN
 from tensorflow.keras.optimizers import Adam
+from data import fetch_data
 
 # Fungsi untuk membangun model RNN
 def build_rnn_model(neurons=1, activation='relu', learning_rate=0.001):
@@ -18,14 +19,19 @@ def build_rnn_model(neurons=1, activation='relu', learning_rate=0.001):
     return model
 
 # Memuat data harga saham close BMRI
-data = pd.read_csv('BMRI.JK.csv')  # Ubah dengan nama file yang sesuai
+data = fetch_data()  # Ubah dengan nama file yang sesuai
 
-# Forward fill missing date values
-data['Date'] = pd.to_datetime(data['Date'], format='%Y-%m-%d')
-data = data.set_index('Date')
+
+# print(data)
+
+# # Forward fill missing date values
+data['date'] = pd.to_datetime(data['date'], format='%Y-%m-%d')
+data = data.set_index('date')
 data = data.resample('D').ffill()
 
-close_prices = data['Close'].values.reshape(-1, 1)
+# print(data)
+
+close_prices = data['close'].values.reshape(-1, 1)
 
 # Melakukan penskalaan fitur
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -58,16 +64,18 @@ param_grid = {'neurons': neurons, 'activation': activations, 'learning_rate': le
 grid_search = GridSearchCV(estimator=model, param_grid=param_grid, scoring='neg_root_mean_squared_error', cv=3)
 grid_result = grid_search.fit(X_train, y_train, epochs=100)
 
-# Menampilkan hasil grid search
-print("Grid Search Results:")
-print()
-print("Best Parameters: ", grid_result.best_params_)
-print("Best RMSE Score: ", -grid_result.best_score_)
-print()
-
-# Menampilkan nilai parameter dan nilai RMSE setiap kali melakukan percobaan pada GridSearchCV
+# Memasukkan hasil ke dalam file CSV
 results = grid_result.cv_results_
-for i in range(len(results['params'])):
-    print("Parameters: ", results['params'][i])
-    print("RMSE Score: ", -results['mean_test_score'][i])
-    print()
+df_results = pd.DataFrame.from_dict(results)
+
+# Fungsi untuk menghitung RMSE
+def calculate_rmse(row):
+    return np.sqrt(-row['mean_test_score'])
+
+# Menambahkan kolom "RMSE" dengan nilai RMSE pada setiap baris
+df_results['RMSE'] = df_results.apply(calculate_rmse, axis=1)
+
+# Menyimpan DataFrame ke dalam file CSV
+df_results.to_csv('RNN_tuning_result.csv', index=False)
+
+    

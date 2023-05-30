@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from datetime import datetime
 import mysql.connector
 
@@ -94,10 +94,11 @@ def main():
         insert_data(df)
 
         st.success("Data berhasil disimpan ke database.")
-
+        
     dataframe = fetch_data()
-    datachart = chart_data()
     if dataframe is not None:
+        datachart = chart_data()
+        
         # Menampilkan DataFrame
         st.dataframe(dataframe, width=800)
         st.divider()
