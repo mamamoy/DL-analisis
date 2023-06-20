@@ -1,5 +1,6 @@
 import mysql.connector
 from datetime import datetime
+import pandas as pd
 
 # Koneksi ke database MySQL
 def create_connection():
@@ -7,7 +8,7 @@ def create_connection():
         host="localhost",
         user="root",
         password="",
-        database="analisis_sistem"  # Ganti dengan nama database yang sesuai
+        database="dataset_saham"  # Ganti dengan nama database yang sesuai
     )
     return conn
 
@@ -19,12 +20,12 @@ def create_table():
     table_query = '''
     CREATE TABLE IF NOT EXISTS saham (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        date DATE,
-        open FLOAT,
-        high FLOAT,
-        low FLOAT,
-        close FLOAT,
-        volume FLOAT
+        Date DATE,
+        Open FLOAT,
+        High FLOAT,
+        Low FLOAT,
+        Close FLOAT,
+        Volume FLOAT
     )
     '''
 
@@ -36,7 +37,7 @@ def insert_data(data):
     conn = create_connection()
     cursor = conn.cursor()
 
-    insert_query = "INSERT INTO saham (date, open, high, low, close, volume) VALUES (%s, %s, %s, %s, %s, %s)"
+    insert_query = "INSERT INTO saham (Date, Open, High, Low, Close, Volume) VALUES (%s, %s, %s, %s, %s, %s)"
 
     # Menggunakan iterasi untuk memasukkan setiap baris data
     for row in data.itertuples(index=False):
@@ -45,5 +46,25 @@ def insert_data(data):
         values = (date, row[1], row[2], row[3], row[4], row[5])
         cursor.execute(insert_query, values)
 
+    conn.commit()
+    conn.close()
+
+# Menampilkan data dari database
+def fetch_data():
+    conn = create_connection()
+    query = "SELECT * FROM saham"  # Ganti dengan query sesuai kebutuhan
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
+
+def delete_data():
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    truncate_query = '''
+    TRUNCATE TABLE saham
+    '''
+
+    cursor.execute(truncate_query)
     conn.commit()
     conn.close()

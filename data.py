@@ -10,7 +10,7 @@ def create_connection():
         host="localhost",
         user="root",
         password="",
-        database="analisis_sistem"  # Ganti dengan nama database yang sesuai
+        database="dataset_saham"  # Ganti dengan nama database yang sesuai
     )
     return conn
 

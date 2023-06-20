@@ -25,13 +25,13 @@ data = fetch_data()  # Ubah dengan nama file yang sesuai
 # print(data)
 
 # # Forward fill missing date values
-data['date'] = pd.to_datetime(data['date'], format='%Y-%m-%d')
-data = data.set_index('date')
+data['Date'] = pd.to_datetime(data['Date'], format='%Y-%m-%d')
+data = data.set_index('Date')
 data = data.resample('D').ffill()
 
 # print(data)
 
-close_prices = data['close'].values.reshape(-1, 1)
+close_prices = data['Close'].values.reshape(-1, 1)
 
 # Melakukan penskalaan fitur
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -62,7 +62,7 @@ learning_rate = [0.001, 0.01, 0.1]
 model = KerasRegressor(build_fn=build_rnn_model, verbose=0)
 param_grid = {'neurons': neurons, 'activation': activations, 'learning_rate': learning_rate}
 grid_search = GridSearchCV(estimator=model, param_grid=param_grid, scoring='neg_root_mean_squared_error', cv=3)
-grid_result = grid_search.fit(X_train, y_train, epochs=100)
+grid_result = grid_search.fit(X_train, y_train, epochs=100, batch_size=128)
 
 # Memasukkan hasil ke dalam file CSV
 results = grid_result.cv_results_
