@@ -210,6 +210,9 @@ def rank_models(compare_file, weights):
         'R-square': average_r2
     })
 
+    # Mengurutkan DataFrame berdasarkan kriteria yang diinginkan
+    average_metrics_df.sort_values(by=['RMSE', 'MSE', 'MAE', 'R-square'], ascending=[True, True, True, False], inplace=True)
+
     st.dataframe(average_metrics_df, width=800) 
     
     st.divider()
@@ -319,32 +322,97 @@ def run_predict():
             actual_data = fetch_data()
             data = pd.read_csv('predict.csv')
             if data is not None:
-                st.divider()
                 st.subheader('Tabel hasil prediksi')
                 st.dataframe(data, width=800)
-                st.divider()
-                st.subheader("Chart hasil prediksi")
-                # Membuat trace untuk data aktual
-                trace_actual = go.Scatter(x=actual_data['Date'], y=actual_data['Close'], name='Aktual',
-                                         line=dict(color='blue'))
 
-                # Membuat trace untuk data prediksi
-                trace_predicted = go.Scatter(x=data['Date'], y=data['Close'], name='Prediksi',
-                                            line=dict(color='red'))
+                # Membuat tab untuk masing-masing fitur (Open, High, Low, Close)
+                tab_open, tab_high, tab_low, tab_close = st.tabs(["Open", "High", "Low", "Close"])
 
-                # Menggabungkan trace menjadi satu
-                data = [trace_actual, trace_predicted]
+                with tab_open:
+                    st.header("Chart hasil prediksi Open")
+                    # Membuat trace untuk data aktual dan prediksi Open
+                    trace_actual_open = go.Scatter(x=actual_data['Date'], y=actual_data['Open'], name='Open Aktual',
+                                                line=dict(color='blue'))
+                    trace_predicted_open = go.Scatter(x=data['Date'], y=data['Open'], name='Open Prediksi',
+                                                    line=dict(color='red'))
 
-                # Mengatur layout chart
-                layout = go.Layout(title='Prediksi Harga')
+                    # Menggabungkan trace menjadi satu
+                    data_open = [trace_actual_open, trace_predicted_open]
 
-                # Membuat figure dan menambahkan data dan layout
-                fig = go.Figure(data=data, layout=layout)
+                    # Mengatur layout chart
+                    layout_open = go.Layout(title='Prediksi Harga Open')
 
-                # Menampilkan chart menggunakan plotly_chart
-                st.plotly_chart(fig)
+                    # Membuat figure dan menambahkan data dan layout
+                    fig_open = go.Figure(data=data_open, layout=layout_open)
+
+                    # Menampilkan chart menggunakan plotly_chart
+                    st.plotly_chart(fig_open)
+
+                with tab_high:
+                    st.header("Chart hasil prediksi High")
+                    # Membuat trace untuk data aktual dan prediksi High
+                    trace_actual_high = go.Scatter(x=actual_data['Date'], y=actual_data['High'], name='High Aktual',
+                                                line=dict(color='blue'))
+                    trace_predicted_high = go.Scatter(x=data['Date'], y=data['High'], name='High Prediksi',
+                                                    line=dict(color='red'))
+
+                    # Menggabungkan trace menjadi satu
+                    data_high = [trace_actual_high, trace_predicted_high]
+
+                    # Mengatur layout chart
+                    layout_high = go.Layout(title='Prediksi Harga High')
+
+                    # Membuat figure dan menambahkan data dan layout
+                    fig_high = go.Figure(data=data_high, layout=layout_high)
+
+                    # Menampilkan chart menggunakan plotly_chart
+                    st.plotly_chart(fig_high)
+
+                with tab_low:
+                    st.header("Chart hasil prediksi Low")
+                    # Membuat trace untuk data aktual dan prediksi Low
+                    trace_actual_low = go.Scatter(x=actual_data['Date'], y=actual_data['Low'], name='Low Aktual',
+                                                line=dict(color='blue'))
+                    trace_predicted_low = go.Scatter(x=data['Date'], y=data['Low'], name='Low Prediksi',
+                                                    line=dict(color='red'))
+
+                    # Menggabungkan trace menjadi satu
+                    data_low = [trace_actual_low, trace_predicted_low]
+
+                    # Mengatur layout chart
+                    layout_low = go.Layout(title='Prediksi Harga Low')
+
+                    # Membuat figure dan menambahkan data dan layout
+                    fig_low = go.Figure(data=data_low, layout=layout_low)
+
+                    # Menampilkan chart menggunakan plotly_chart
+                    st.plotly_chart(fig_low)
+
+                with tab_close:
+                    st.header("Chart hasil prediksi Close")
+                    # Membuat trace untuk data aktual dan prediksi Close
+                    trace_actual_close = go.Scatter(x=actual_data['Date'], y=actual_data['Close'], name='Close Aktual',
+                                                line=dict(color='blue'))
+                    trace_predicted_close = go.Scatter(x=data['Date'], y=data['Close'], name='Close Prediksi',
+                                                    line=dict(color='red'))
+
+                    # Menggabungkan trace menjadi satu
+                    data_close = [trace_actual_close, trace_predicted_close]
+
+                    # Mengatur layout chart
+                    layout_close = go.Layout(title='Prediksi Harga Close')
+
+                    # Membuat figure dan menambahkan data dan layout
+                    fig_close = go.Figure(data=data_close, layout=layout_close)
+
+                    # Menampilkan chart menggunakan plotly_chart
+                    st.plotly_chart(fig_close)
+
+            else:
+                st.warning("Belum melakukan prediksi.")
         except FileNotFoundError:
             st.warning("Belum melakukan prediksi.")
+
 
 
           

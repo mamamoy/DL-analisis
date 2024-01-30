@@ -37,6 +37,8 @@ close_prices = data['Close'].values.reshape(-1, 1)
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_prices = scaler.fit_transform(close_prices)
 
+print(scaled_prices)
+
 # Membagi data menjadi data latih dan data validasi
 train_size = int(len(scaled_prices) * 0.8)
 train_data = scaled_prices[:train_size]

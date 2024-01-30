@@ -37,6 +37,13 @@ def insert_data(data):
     conn = create_connection()
     cursor = conn.cursor()
 
+    # Memeriksa apakah tabel saham sudah ada
+    cursor.execute("SHOW TABLES LIKE 'saham'")
+    table_exists = cursor.fetchone()
+
+    if not table_exists:
+        create_table()
+
     insert_query = "INSERT INTO saham (Date, Open, High, Low, Close, Volume) VALUES (%s, %s, %s, %s, %s, %s)"
 
     # Menggunakan iterasi untuk memasukkan setiap baris data
